@@ -2,7 +2,6 @@ from sklearn.linear_model._base import LinearClassifierMixin, SparseCoefMixin
 from sklearn.base import BaseEstimator
 from sklearn.utils import check_X_y
 from sklearn.utils.multiclass import unique_labels
-from scipy.optimize import newton
 
 import numpy as np
 
@@ -11,7 +10,7 @@ class CoordinateDescentSVC(BaseEstimator, LinearClassifierMixin, SparseCoefMixin
     """
     TODO: Add docstrings
     """
-    def __init__(self, C=0.1, beta=0.5, sigma=0.5, max_iter=1000):
+    def __init__(self, C=1, beta=0.5, sigma=0.01, max_iter=100):
         """
         TODO: Add docstrings
         Parameters
@@ -33,26 +32,19 @@ class CoordinateDescentSVC(BaseEstimator, LinearClassifierMixin, SparseCoefMixin
         # Store the classes seen during fit
         self.classes_ = unique_labels(y)
 
-        self.X_ = X
-        self.y_ = y
+        self.X = X
+        self.y = 2 * y - 1
 
-        # TODO: init w
+        self.w = np.zeros(X.shape[1])
         for k in range(self.max_iter):
-            self.fit_iteration2()
+            self.fit_iteration()
+        self.coef_ = self.w.reshape(1, -1)
+        self.intercept_ = np.zeros(self.X.shape[0]).reshape((-1,1))
         # Return the classifier
         return self
 
     def fit_iteration(self):
-        for e in np.identity(self.X.shape[2]):
-            z = newton(
-                func=lambda x: self.D_prime(self.w, e, x),
-                x0=0,
-                fprime=lambda x: self.D_prime2(self.w, e, x)
-            )
-            self.w = self.get_next_w(self.w, e, z)
-
-    def fit_iteration2(self):
-        for e in np.identity(self.X.shape[2]):
+        for e in np.identity(self.X.shape[1]):
             l = 1
             xx = np.matmul(self.X, e)
             H = 1 + 2 * self.C * np.sum(xx * xx)
@@ -68,12 +60,6 @@ class CoordinateDescentSVC(BaseEstimator, LinearClassifierMixin, SparseCoefMixin
 
     def get_b(self, w):
         return 1 - self.y * np.matmul(self.X, w.transpose())
-
-    def D(self, w, e, z):
-        next_w = self.get_next_w(w, e, z)
-        b = self.get_b(next_w)
-        b[b <= 0] = 0
-        return 0.5 * np.dot(next_w, next_w) + self.C * np.sum(b * b)
 
     def D_prime(self, w, e, z):
         next_w = self.get_next_w(w, e, z)

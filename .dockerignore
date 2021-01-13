@@ -1,8 +1,0 @@
-# ignore everything
-*
-
-# except requirements
-!requirements.txt
-
-# except source code
-!coordinate_descent_svc
