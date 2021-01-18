@@ -9,3 +9,5 @@ RUN pip install -r requirements.txt
 COPY tests.py .
 
 COPY coordinate_descent_svc coordinate_descent_svc
+
+RUN pytest tests.py

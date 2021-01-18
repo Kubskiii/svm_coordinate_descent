@@ -13,9 +13,6 @@ class CoordinateDescentSVC(BaseEstimator, LinearClassifierMixin, SparseCoefMixin
     def __init__(self, C=1, beta=0.5, sigma=0.01, max_iter=100):
         """
         TODO: Add docstrings
-        Parameters
-        ----------
-        C
         """
         self.C = C
         self.beta = beta
@@ -39,7 +36,7 @@ class CoordinateDescentSVC(BaseEstimator, LinearClassifierMixin, SparseCoefMixin
         for k in range(self.max_iter):
             self.fit_iteration()
         self.coef_ = self.w.reshape(1, -1)
-        self.intercept_ = np.zeros(self.X.shape[0]).reshape((-1,1))
+        self.intercept_ = 0
         # Return the classifier
         return self
 
