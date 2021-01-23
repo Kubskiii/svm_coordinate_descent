@@ -5,11 +5,12 @@ import sklearn.datasets as skd
 import sklearn.model_selection as skms
 import sklearn.metrics as skm
 
-from coordinate_descent_svc import CoordinateDescentSVC
+from coordinate_descent_svc import CoordinateDescentSVC, lbfgsbSVM
 
 
 methods_dict = {
-    "coordinate-descent": CoordinateDescentSVC()
+    "coordinate-descent": CoordinateDescentSVC(),
+    "lbfgsb": lbfgsbSVM()
 }
 
 
