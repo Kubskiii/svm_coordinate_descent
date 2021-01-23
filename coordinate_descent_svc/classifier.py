@@ -24,7 +24,7 @@ class CoordinateDescentSVC(BaseEstimator, LinearClassifierMixin, SparseCoefMixin
         TODO: Add docstrings
         """
         # Check that X and y have correct shape
-        X, y = check_X_y(X, y)
+        X, y = check_X_y(X, y, accept_sparse=True)
 
         # Store the classes seen during fit
         self.classes_ = unique_labels(y)
@@ -43,7 +43,7 @@ class CoordinateDescentSVC(BaseEstimator, LinearClassifierMixin, SparseCoefMixin
     def fit_iteration(self):
         for e in np.identity(self.X.shape[1]):
             l = 1
-            xx = np.matmul(self.X, e)
+            xx = self.X @ e
             H = 1 + 2 * self.C * np.sum(xx * xx)
             l_dashed = self.D_prime2(self.w, e, 0) / (H / 2 + self.sigma)
             while l > l_dashed:
@@ -56,18 +56,18 @@ class CoordinateDescentSVC(BaseEstimator, LinearClassifierMixin, SparseCoefMixin
         return w + e * z
 
     def get_b(self, w):
-        return 1 - self.y * np.matmul(self.X, w.transpose())
+        return 1 - self.y * (self.X @ w.transpose())
 
     def D_prime(self, w, e, z):
         next_w = self.get_next_w(w, e, z)
         b = self.get_b(next_w)
-        yxb = self.y * np.matmul(self.X, e) * b
+        yxb = self.y * (self.X @ e) * b
         yxb[b <= 0] = 0
         return np.dot(w, e) + z - 2 * self.C * np.sum(yxb)
 
     def D_prime2(self, w, e, z):
         next_w = self.get_next_w(w, e, z)
         b = self.get_b(next_w)
-        xx = np.matmul(self.X, e)
+        xx = self.X @ e
         xx[np.ravel(b) <= 0] = 0
         return 1 + 2 * self.C * np.sum(xx * xx)
