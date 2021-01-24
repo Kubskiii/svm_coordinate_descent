@@ -6,13 +6,19 @@ import pandas as pd
 import re
 
 
+methods_dict = {
+    "coord_desc": "Coordinate Descent",
+    "lbfgsb": "L-BFGS-B"
+}
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("-d", "--directory", type=str, help="Directory with results CSV")
     parser.add_argument("-f", "--format", default="png", help="Output format of generated plots")
     args = parser.parse_args()
     directory = args.directory
-    format = args.format
+    file_format = args.format
     data_dict = dict()
 
     for file in os.listdir(directory):
@@ -29,13 +35,18 @@ def main():
     os.mkdir(plots_directory)
     plt.style.use("ggplot")
     for dataset, dataset_dict in data_dict.items():
-        for y in ["loss", "loss_prime", "train_acc", "test_acc"]:
+        for y, y_label in {
+            "loss": "Wartość funkcji straty",
+            "loss_prime": "Wartość pochodnej funkcji straty",
+            "train_acc": "Skuteczność na zbiorze treningowym [%]",
+            "test_acc": "Skuteczność na zbiorze testowym [%]"
+        }.items():
             for model, data in dataset_dict.items():
-                plt.plot(range(1, len(data) + 1), data[y], label=model)
+                plt.plot(range(1, len(data) + 1), data[y], label=methods_dict[model])
             plt.legend()
-            plt.xlabel("iteration")
-            plt.ylabel(y)
-            plt.savefig(os.path.join(plots_directory, f"{dataset}_{y}.{format}"))
+            plt.xlabel("Numer iteracji")
+            plt.ylabel(y_label)
+            plt.savefig(os.path.join(plots_directory, f"{dataset}_{y}.{file_format}"))
             plt.clf()
 
 

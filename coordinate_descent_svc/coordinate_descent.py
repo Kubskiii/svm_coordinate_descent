@@ -4,13 +4,13 @@ import numpy as np
 
 
 class CoordinateDescentSVC(BaseSVM):
-    def __init__(self, C=1, beta=0.5, sigma=0.01, max_iter=50, callback=None):
+    def __init__(self, C=1, beta=0.5, sigma=0.01, max_iter=1000, ftol=1e-4, callback=None):
         self.C = C
         self.beta = beta
         self.sigma = sigma
         self.max_iter = max_iter
         self.callback = callback
-        self.ftol=1e-8
+        self.ftol = ftol
 
     def get_w(self, w0, X, y):
         w = w0
@@ -27,7 +27,8 @@ class CoordinateDescentSVC(BaseSVM):
                 w = self.get_next_w(w, e, z)
             self.w = w
             self.coef_ = w.reshape(1, -1)
-            self.callback(self)
+            if self.callback:
+                self.callback(self)
             loss = self.loss(w, X, y)
             if (prev_loss - loss) / max(loss, prev_loss, 1) <= self.ftol:
                 break

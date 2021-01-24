@@ -1,2 +1,2 @@
-from .classifier import CoordinateDescentSVC
-from .lbfgsb_svm import lbfgsbSVM
+from .coordinate_descent import CoordinateDescentSVC
+from .lbfgsb import lbfgsbSVM

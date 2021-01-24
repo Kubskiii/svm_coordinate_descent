@@ -1,31 +1,90 @@
 FROM python:3.7
 
-COPY requirements.txt .
+# copy project
+COPY . .
 
-RUN pip install -r requirements.txt
+# build package
+RUN python setup.py sdist bdist_wheel
 
-COPY coordinate_descent_svc coordinate_descent_svc
+# install builded package
+RUN pip install dist/*.whl
 
-COPY *.py ./
+# install test dependencies
+RUN pip install -r requirements-test.txt
 
+# create directory for results
 RUN mkdir results
 
-ARG SEED=1234
+# define arguments for all test cases
+ARG SEED=123456789
+ARG LITTLE_FEATURES=50
+ARG MANY_FEATURES=1000
+ARG LITTLE_SAMPLES=10000
+ARG MANY_SAMPLES=100000
 
-RUN ./test.py -f 10 -s 1000 -r $SEED -m lbfgsb -o results/lbfgsb_10_1000.csv
+# run test case for data set with little features and little samples using L-BFGS-B
+RUN ./test.py \
+--features $LITTLE_FEATURES \
+--samples $LITTLE_SAMPLES \
+--random-seed $SEED \
+--method lbfgsb \
+--output results/lbfgsb_${LITTLE_FEATURES}_${LITTLE_SAMPLES}.csv
 
-RUN ./test.py -f 10 -s 1000 -r $SEED -m coordinate-descent -o results/coord_desc_10_1000.csv
+# run test case for data set with little features and little samples using Coordinate Descent
+RUN ./test.py \
+--features $LITTLE_FEATURES \
+--samples $LITTLE_SAMPLES \
+--random-seed $SEED \
+--method coordinate-descent \
+--output results/coord_desc_${LITTLE_FEATURES}_${LITTLE_SAMPLES}.csv
 
-RUN ./test.py -f 10 -s 100000 -r $SEED -m lbfgsb -o results/lbfgsb_10_100000.csv
+# run test case for data set with little features and many samples using L-BFGS-B
+RUN ./test.py \
+--features $LITTLE_FEATURES \
+--samples $MANY_SAMPLES \
+--random-seed $SEED \
+--method lbfgsb \
+--output results/lbfgsb_${LITTLE_FEATURES}_${MANY_SAMPLES}.csv
 
-RUN ./test.py -f 10 -s 100000 -r $SEED -m coordinate-descent -o results/coord_desc_10_100000.csv
+# run test case for data set with little features and many samples using Coordinate Descent
+RUN ./test.py \
+--features $LITTLE_FEATURES \
+--samples $MANY_SAMPLES \
+--random-seed $SEED \
+--method coordinate-descent \
+--output results/coord_desc_${LITTLE_FEATURES}_${MANY_SAMPLES}.csv
 
-RUN ./test.py -f 1000 -s 1000 -r $SEED -m lbfgsb -o results/lbfgsb_1000_1000.csv
+# run test case for data set with many features and little samples using L-BFGS-B
+RUN ./test.py \
+--features $MANY_FEATURES \
+--samples $LITTLE_SAMPLES \
+--random-seed $SEED \
+--method lbfgsb \
+--output results/lbfgsb_${MANY_FEATURES}_${LITTLE_SAMPLES}.csv
 
-RUN ./test.py -f 1000 -s 1000 -r $SEED -m coordinate-descent -o results/coord_desc_1000_1000.csv
+# run test case for data set with many features and little samples using Coordinate Descent
+RUN ./test.py \
+--features $MANY_FEATURES \
+--samples $LITTLE_SAMPLES \
+--random-seed $SEED \
+--method coordinate-descent \
+--output results/coord_desc_${MANY_FEATURES}_${LITTLE_SAMPLES}.csv
 
-RUN ./test.py -f 1000 -s 100000 -r $SEED -m lbfgsb -o results/lbfgsb_1000_100000.csv
+# run test case for data set with many features and many samples using L-BFGS-B
+RUN ./test.py \
+--features $MANY_FEATURES \
+--samples $MANY_SAMPLES \
+--random-seed $SEED \
+--method lbfgsb \
+--output results/lbfgsb_${MANY_FEATURES}_${MANY_SAMPLES}.csv
 
-RUN ./test.py -f 1000 -s 100000 -r $SEED -m coordinate-descent -o results/coord_desc_1000_100000.csv
+# run test case for data set with many features and many samples using Coordinate Descent
+RUN ./test.py \
+--features $MANY_FEATURES \
+--samples $MANY_SAMPLES \
+--random-seed $SEED \
+--method coordinate-descent \
+--output results/coord_desc_${MANY_FEATURES}_${MANY_SAMPLES}.csv
 
-RUN ./generate_plots.py -d results
+# generate plots for performed tests
+RUN ./generate_plots.py --directory results
