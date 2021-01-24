@@ -3,7 +3,7 @@ from scipy.optimize import minimize
 
 
 class lbfgsbSVM(BaseSVM):
-    def __init__(self, C=1, ftol=1e-4, callback=None):
+    def __init__(self, C=1, ftol=1e-8, callback=None):
         self.C = C
         self.callback = callback
         self.ftol = ftol

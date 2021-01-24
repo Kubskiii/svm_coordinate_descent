@@ -46,7 +46,7 @@ def test_method(method_name, samples, features, seed=None):
         })
         print(f"loss: {loss:8.2f}, loss_prime: {loss_prime:8.2f}, train_acc: {acc1:5.2f}, test_acc: {acc2:5.2f}")
 
-    method = methods_dict.get(method_name)(callback=callback, ftol=1e-4)
+    method = methods_dict.get(method_name)(callback=callback, ftol=1e-8)
 
     start_time = datetime.now()
     method.fit(X_train, y_train)

@@ -4,7 +4,7 @@ import numpy as np
 
 
 class CoordinateDescentSVC(BaseSVM):
-    def __init__(self, C=1, beta=0.5, sigma=0.01, max_iter=1000, ftol=1e-4, callback=None):
+    def __init__(self, C=1, beta=0.5, sigma=0.01, max_iter=1000, ftol=1e-8, callback=None):
         self.C = C
         self.beta = beta
         self.sigma = sigma
